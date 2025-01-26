@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>パスワードマネージャー</title>
+	<style>
+		body {
+			font-family: 'Noto Sans JP', sans-serif;
+			color: #696969;
+			background-color: #000000;
+			text-align: center;
+		}
+		table {
+			margin: 0 auto;
+		}
+		table th, table td {
+			padding: 8px;
+		}
+		button {
+			color: #FFFFFF;
+			background-color: #000000;
+			border: none;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<h1>パスワードマネージャー</h1>
+	<table>
+		<thead>
+			<tr>
+				<th>アプリケーション</th>
+				<th>ユーザー名</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody id="appList"></tbody>
+	</table>
+	<button onclick="window.location.href='add.html'">追加</button>
+	<script>
+		async function fetchApps() {
+			try {
+				const response = await fetch('http://localhost:8080/passwords');
+				const apps = await response.json();
+				
+				const appList = document.getElementById('appList');
+				appList.innerHTML = '';
+				apps.forEach(app => {
+					appList.innerHTML += `
+						<tr>
+							<td>${app.appName}</td>
+							<td>${app.username}</td>
+							<td>
+								<button onclick="editApp(${app.id})">編集</button>
+								<button class="delete" onclick="deleteApp(${app.id})">削除</button>
+							</td>
+						</tr>
+					`;
+				});
+			} catch(error) {
+				console.error('エラーが発生しました：', error);
+				alert('データ取得中にエラーが発生しました');
+			}
+		}
+		
+		function editApp(id) {
+			window.location.href=`edit.html?id=${id}`;
+		}
+		
+		async function deleteApp(id) {
+			if(confirm('削除しますか？')) {
+				try {
+					await fetch(`http://localhost:8080/passwords/${id}`, {
+						method: 'DELETE',
+					});
+					alert('削除しました');
+					fetchApps();
+				} catch(error) {
+					console.error('エラーが発生しました：', error);
+					alert('データ削除中にエラーが発生しました');
+				}
+			}
+		}
+		
+		fetchApps();
+	</script>
+</body>
+</html>

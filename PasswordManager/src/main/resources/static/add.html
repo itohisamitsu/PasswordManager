@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width", "initial-scale=1.0">
+	<title>パスワード登録</title>
+	<style>
+		body {
+			font-family: 'Noto Sans JP', sans-serif;
+			color: #696969;
+			background-color: #000000;
+			text-align: center;
+		}
+		button {
+			color: #FFFFFF;
+			background-color: #000000;
+			border: none;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<h1>パスワード登録</h1>
+	<form id="addForm">
+		<label>
+			アプリケーション：
+			<input type="text" id="appName" required>
+		</label>
+		<br>
+		<label>
+			ユーザー名：
+			<input type="text" id="username" required>
+		</label>
+		<br>
+		<label>
+			パスワード：
+			<input type="text" id="password" required>
+		</label>
+		<br>
+		<button type="submit">追加</button>
+	</form>
+	<br>
+	<button onclick="window.location.href='index.html'">戻る</button>
+	<script>
+		const form = document.getElementById('addForm');
+		
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			
+			const appName = document.getElementById('appName').value;
+			const username = document.getElementById('username').value;
+			const password = document.getElementById('password').value;
+		
+			try {
+				const response = await fetch('http://localhost:8080/passwords', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						appName,
+						username,
+						password,
+					}),
+				});
+				if(response.ok) {
+					alert('パスワードが追加されました');
+					window.location.href = 'index.html';
+				} else {
+					alert('入力内容を確認してください');
+				}
+			} catch(error) {
+				console.error('エラーが発生しました：', error);
+				alert('データ登録中にエラーが発生しました');
+			}
+		});
+	</script>
+</body>
+</html>
